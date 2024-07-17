@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -67,6 +69,44 @@ public class RegistrationService {
         appUserService.enableAppUser(
                 confirmationToken.getAppUser().getEmail());
         return "confirmed";
+    }
+
+    public String resendToken(String email) {
+        System.out.println("Attempting to resend token for email: " + email);
+
+        Optional<AppUser> optionalUser = appUserService.getUserByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalStateException("Email not found");
+        }
+        AppUser user = optionalUser.get();
+        System.out.println("User found: " + user.getFirstName());
+
+        Optional<ConfirmationToken> existingToken = confirmationTokenService.getTokenByUser(user);
+        if (existingToken.isPresent()) {
+            ConfirmationToken token = existingToken.get();
+            System.out.println("Existing token found: " + token.getToken());
+            if (!token.isExpired()) {
+                System.out.println("Token is still valid");
+                return "Token is still valid";
+            } else {
+                System.out.println("Token is expired");
+            }
+        } else {
+            System.out.println("No existing token found");
+        }
+
+        String newToken = UUID.randomUUID().toString();
+        ConfirmationToken token = new ConfirmationToken(newToken, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), user);
+        confirmationTokenService.saveConfirmationToken(token);
+        System.out.println("New token generated: " + newToken);
+
+        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + newToken;
+        emailSender.send(
+                email,
+                buildEmail(user.getFirstName(), link));
+
+        System.out.println("New token sent to email: " + email);
+        return "New token sent";
     }
 
     private String buildEmail(String name, String link) {

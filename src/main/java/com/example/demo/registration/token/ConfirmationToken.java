@@ -39,4 +39,7 @@ public class ConfirmationToken {
         this.expiresAt = expiresAt;
         this.appUser = appUser;
     }
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiresAt);
+    }
 }
