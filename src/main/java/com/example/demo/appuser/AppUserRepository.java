@@ -1,6 +1,5 @@
 package com.example.demo.appuser;
 
-import com.example.demo.registration.token.ConfirmationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +17,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE AppUser a " + "SET a.enabled = TRUE WHERE a.email = ?1")
-    int enableAppUser(String email);
+    void enableAppUser(String email);
 
 }

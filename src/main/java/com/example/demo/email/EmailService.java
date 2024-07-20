@@ -1,5 +1,6 @@
 package com.example.demo.email;
 
+import com.example.demo.exception.EmailSendingException;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class EmailService implements EmailSender {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             LOGGER.error("failed to send email", e);
-            throw new IllegalStateException("failed to send email");
+            throw new EmailSendingException("Failed to send email", e);
         }
     }
 }

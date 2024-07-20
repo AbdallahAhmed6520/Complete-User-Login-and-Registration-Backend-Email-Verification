@@ -13,14 +13,15 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public String register(@RequestBody RegistrationRequest request) {
-        return registrationService.register(request);
+    public ResponseEntity<String> register(@RequestBody RegistrationRequest request) {
+        return ResponseEntity.ok(registrationService.register(request));
     }
 
     @GetMapping(path = "confirm")
-    public String confirm(@RequestParam("token") String token) {
+    public ResponseEntity<String> confirm(@RequestParam("token") String token) {
         return registrationService.confirmToken(token);
     }
+
     @PostMapping("/resendToken")
     public ResponseEntity<String> resendToken(@RequestBody EmailRequest request) {
         return ResponseEntity.ok(registrationService.resendToken(request.getEmail()));

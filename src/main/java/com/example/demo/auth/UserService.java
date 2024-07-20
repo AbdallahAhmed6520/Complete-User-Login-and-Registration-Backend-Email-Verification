@@ -3,7 +3,7 @@ package com.example.demo.auth;
 import com.example.demo.appuser.AppUser;
 import com.example.demo.appuser.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,25 +12,31 @@ import java.util.Optional;
 public class UserService {
 
     private final AppUserRepository appUserRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder PasswordEncoder;
 
     @Autowired
-    public UserService(AppUserRepository appUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(AppUserRepository appUserRepository, PasswordEncoder PasswordEncoder) {
         this.appUserRepository = appUserRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.PasswordEncoder = PasswordEncoder;
     }
 
     public String login(String username, String password) {
         Optional<AppUser> userOptional = appUserRepository.findByEmail(username);
-        if (userOptional.isPresent()) {
-            AppUser user = userOptional.get();
-            if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-                return "Login successful!";
-            } else {
-                return "Invalid credentials!";
-            }
-        } else {
+        if (userOptional.isEmpty()) {
             return "User not found!";
         }
+
+        AppUser user = userOptional.get();
+
+        // Check if the account is confirmed
+        if (!user.isEnabled()) {
+            return "Account is not confirmed!";
+        }
+
+        if (!PasswordEncoder.matches(password, user.getPassword())) {
+            return "Invalid credentials!";
+        }
+
+        return "Login successful!";
     }
 }
