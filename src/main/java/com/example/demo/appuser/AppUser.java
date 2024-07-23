@@ -1,8 +1,6 @@
 package com.example.demo.appuser;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,21 +10,17 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@Entity
+@ToString
+@RequiredArgsConstructor
 public class AppUser implements UserDetails {
-
-
     @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
     private Long id;
-    @Getter
     private String firstName;
-    @Getter
     private String lastName;
     private String email;
     private String password;

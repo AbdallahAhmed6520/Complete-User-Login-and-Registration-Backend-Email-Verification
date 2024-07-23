@@ -4,10 +4,7 @@ import com.example.demo.appuser.AppUser;
 import com.example.demo.appuser.AppUserRole;
 import com.example.demo.appuser.AppUserService;
 import com.example.demo.email.EmailSender;
-import com.example.demo.exception.InvalidEmailException;
-import com.example.demo.exception.TokenAlreadyConfirmedException;
-import com.example.demo.exception.TokenExpiredException;
-import com.example.demo.exception.TokenNotFoundException;
+import com.example.demo.exception.*;
 import com.example.demo.registration.token.ConfirmationToken;
 import com.example.demo.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
@@ -22,11 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,43 +108,34 @@ public class RegistrationService {
             logger.info("No existing token found");
         }
 
-        String newToken = UUID.randomUUID().toString();
-        ConfirmationToken token = new ConfirmationToken(newToken, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), user);
-        confirmationTokenService.saveConfirmationToken(token);
+        String newToken = appUserService.generateAndSaveToken(user);
         logger.info("New token generated: {}", newToken);
 
         String link = "http://localhost:8080/api/v1/registration/confirm?token=" + newToken;
-        emailSender.send(
-                email,
-                buildEmail(user.getFirstName(), link));
+        emailSender.send(email, buildEmail(user.getFirstName(), link));
 
         logger.info("New token sent to email: {}", email);
         return "New token sent";
     }
-
     private String buildEmail(String name, String link) {
         try {
-            // Read HTML template from resources
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream("templates/email-template.html");
 
             if (inputStream == null) {
-                throw new IllegalStateException("Failed to find email template");
+                throw new EmailSendException("Failed to find email template");
             }
 
             String emailTemplate;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 emailTemplate = reader.lines().collect(Collectors.joining("\n"));
             }
-
-            // Replace placeholders with actual values
             emailTemplate = emailTemplate.replace("{name}", name)
                     .replace("{link}", link);
 
             return emailTemplate;
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle exception (e.g., log error or return a default message)
             return "Failed to load email template";
         }
     }
