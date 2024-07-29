@@ -38,4 +38,10 @@ public class EmailService implements EmailSender {
             throw new EmailSendingException("Failed to send email", e);
         }
     }
+    public String buildResetPasswordEmail(String email, String link) {
+        return "Hi,\n\n" +
+                "To reset your password, please click the following link:\n" +
+                link + "\n\n" +
+                "If you did not request this, please ignore this email.";
+    }
 }

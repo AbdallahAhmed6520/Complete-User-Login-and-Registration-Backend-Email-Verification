@@ -1,7 +1,6 @@
 package com.example.demo.appuser;
 
 import com.example.demo.exception.CustomException;
-import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.registration.token.ConfirmationToken;
 import com.example.demo.registration.token.ConfirmationTokenService;
@@ -48,34 +47,39 @@ public class AppUserService implements UserDetailsService {
         appUser.setPassword(encodedPassword);
         appUserRepository.save(appUser);
 
-        generateAndSaveToken(appUser);
-        return "Please Confirm User";
+        return generateAndSaveToken(appUser);
     }
 
     public String generateAndSaveToken(AppUser user) {
         String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), user);
+        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1), user);
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
     }
 
-    public String login(String email, String password) {
-        AppUser user = appUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
+    public String login(String username, String password) {
+        Optional<AppUser> optionalUser = appUserRepository.findByEmail(username);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalStateException("User not found");
+        }
+        AppUser user = optionalUser.get();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid password");
+            throw new IllegalStateException("Incorrect password");
         }
 
-        if (!user.isEnabled()) {
-            throw new IllegalStateException("User not enabled");
-        }
-
-        generateAndSaveToken(user);
-        return "Login Successful!";
+        // إنشاء وحفظ التوكن
+        return generateAndSaveToken(user);
     }
 
     public void enableAppUser(String email) {
         appUserRepository.enableAppUser(email);
+    }
+
+    public void save(AppUser appUser) {
+        appUserRepository.save(appUser);
+    }
+
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }

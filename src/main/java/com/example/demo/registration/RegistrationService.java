@@ -5,6 +5,8 @@ import com.example.demo.appuser.AppUserRole;
 import com.example.demo.appuser.AppUserService;
 import com.example.demo.email.EmailSender;
 import com.example.demo.exception.*;
+import com.example.demo.registration.passwordReset.PasswordResetToken;
+import com.example.demo.registration.passwordReset.PasswordResetTokenService;
 import com.example.demo.registration.token.ConfirmationToken;
 import com.example.demo.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,7 @@ public class RegistrationService {
     private final AppUserService appUserService;
     private final EmailValidator emailValidator;
     private final ConfirmationTokenService confirmationTokenService;
+    private final PasswordResetTokenService passwordResetTokenService;
     private final EmailSender emailSender;
     private final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
 
@@ -117,7 +121,36 @@ public class RegistrationService {
         logger.info("New token sent to email: {}", email);
         return "New token sent";
     }
-    private String buildEmail(String name, String link) {
+    public String requestPasswordReset(String email) {
+        Optional<AppUser> optionalUser = appUserService.getUserByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        AppUser user = optionalUser.get();
+        String token = generateAndSaveToken(email);
+
+        String link = "http://localhost:8080/api/v1/password-reset/reset?token=" + token;
+        String emailContent = buildEmail(user.getFirstName(), link);
+        emailSender.send(email, emailContent);
+
+        return token;
+    }
+
+    public String generateAndSaveToken(String email) {
+        Optional<AppUser> optionalUser = appUserService.getUserByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        AppUser user = optionalUser.get();
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setToken(token);
+        passwordResetToken.setExpiresAt(LocalDateTime.now().plusHours(1));
+        passwordResetToken.setAppUser(user);
+        passwordResetTokenService.savePasswordResetToken(passwordResetToken);
+        return token;
+    }
+    public String buildEmail(String name, String link) {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream("templates/email-template.html");
