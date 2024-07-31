@@ -1,5 +1,6 @@
-package com.example.demo.appuser;
+package com.example.demo.repository;
 
+import com.example.demo.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,8 @@
-package com.example.demo.registration.token;
+package com.example.demo.security;
 
-import com.example.demo.appuser.AppUser;
+import com.example.demo.model.AppUser;
+import com.example.demo.model.ConfirmationToken;
+import com.example.demo.service.ConfirmationTokenService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

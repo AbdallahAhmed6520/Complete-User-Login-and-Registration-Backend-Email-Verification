@@ -1,8 +1,10 @@
-package com.example.demo.registration.passwordReset;
+package com.example.demo.service;
 
-import com.example.demo.appuser.AppUser;
-import com.example.demo.appuser.AppUserService;
+import com.example.demo.model.AppUser;
+import com.example.demo.service.AppUserService;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.model.PasswordResetToken;
+import com.example.demo.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

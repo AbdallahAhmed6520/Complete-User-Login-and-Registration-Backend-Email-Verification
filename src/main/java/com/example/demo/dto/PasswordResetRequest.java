@@ -1,4 +1,4 @@
-package com.example.demo.registration.passwordReset;
+package com.example.demo.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,10 @@
-package com.example.demo.appuser;
+package com.example.demo.service;
 
 import com.example.demo.exception.CustomException;
 import com.example.demo.exception.UserNotFoundException;
-import com.example.demo.registration.token.ConfirmationToken;
-import com.example.demo.registration.token.ConfirmationTokenService;
+import com.example.demo.model.AppUser;
+import com.example.demo.model.ConfirmationToken;
+import com.example.demo.repository.AppUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,9 +78,5 @@ public class AppUserService implements UserDetailsService {
 
     public void save(AppUser appUser) {
         appUserRepository.save(appUser);
-    }
-
-    public String encodePassword(String password) {
-        return passwordEncoder.encode(password);
     }
 }

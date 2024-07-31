@@ -1,6 +1,8 @@
-package com.example.demo.registration;
+package com.example.demo.Controller;
 
 import com.example.demo.email.EmailRequest;
+import com.example.demo.dto.RegistrationRequest;
+import com.example.demo.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

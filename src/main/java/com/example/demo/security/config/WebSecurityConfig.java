@@ -1,7 +1,7 @@
 package com.example.demo.security.config;
 
-import com.example.demo.appuser.AppUserService;
-import com.example.demo.registration.token.TokenAuthenticationFilter;
+import com.example.demo.service.AppUserService;
+import com.example.demo.security.TokenAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/v1/registration/**", "/api/v1/auth/**","/api/v1/password-reset/**").permitAll()
+                .antMatchers("/api/v1/auth/update").authenticated()
                 .anyRequest()
                 .authenticated().and()
                 .formLogin()

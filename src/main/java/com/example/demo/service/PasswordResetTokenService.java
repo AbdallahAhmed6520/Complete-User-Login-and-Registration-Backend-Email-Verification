@@ -1,5 +1,7 @@
-package com.example.demo.registration.passwordReset;
+package com.example.demo.service;
 
+import com.example.demo.model.PasswordResetToken;
+import com.example.demo.repository.PasswordResetTokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

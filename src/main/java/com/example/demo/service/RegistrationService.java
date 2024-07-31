@@ -1,14 +1,13 @@
-package com.example.demo.registration;
+package com.example.demo.service;
 
-import com.example.demo.appuser.AppUser;
-import com.example.demo.appuser.AppUserRole;
-import com.example.demo.appuser.AppUserService;
+import com.example.demo.model.AppUser;
+import com.example.demo.model.AppUserRole;
+import com.example.demo.email.EmailValidator;
+import com.example.demo.dto.RegistrationRequest;
 import com.example.demo.email.EmailSender;
 import com.example.demo.exception.*;
-import com.example.demo.registration.passwordReset.PasswordResetToken;
-import com.example.demo.registration.passwordReset.PasswordResetTokenService;
-import com.example.demo.registration.token.ConfirmationToken;
-import com.example.demo.registration.token.ConfirmationTokenService;
+import com.example.demo.model.PasswordResetToken;
+import com.example.demo.model.ConfirmationToken;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

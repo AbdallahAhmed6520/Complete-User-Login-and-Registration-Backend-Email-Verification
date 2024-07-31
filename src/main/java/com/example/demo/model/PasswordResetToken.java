@@ -1,6 +1,6 @@
-package com.example.demo.registration.passwordReset;
+package com.example.demo.model;
 
-import com.example.demo.appuser.AppUser;
+import com.example.demo.model.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,7 @@
-package com.example.demo.auth;
+package com.example.demo.Controller;
 
-import com.example.demo.appuser.AppUserService;
+import com.example.demo.service.AppUserService;
+import com.example.demo.dto.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

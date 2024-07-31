@@ -1,6 +1,8 @@
-package com.example.demo.registration.passwordReset;
+package com.example.demo.Controller;
 
+import com.example.demo.dto.PasswordResetRequest;
 import com.example.demo.email.EmailSender;
+import com.example.demo.service.PasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

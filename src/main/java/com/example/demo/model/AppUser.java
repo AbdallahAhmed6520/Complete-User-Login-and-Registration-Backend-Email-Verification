@@ -1,4 +1,4 @@
-package com.example.demo.appuser;
+package com.example.demo.model;
 
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
