@@ -1,15 +1,20 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.UpdateUserRequest;
 import com.example.demo.exception.CustomException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.AppUser;
 import com.example.demo.model.ConfirmationToken;
 import com.example.demo.repository.AppUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,6 +77,21 @@ public class AppUserService implements UserDetailsService {
         return generateAndSaveToken(user);
     }
 
+    @Transactional
+    public void updateUser(Long userId, UpdateUserRequest request, UserDetails userDetails) {
+        AppUser user = appUserRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Verify if the authenticated user is updating their own data
+        if (!user.getEmail().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("You can only update your own data");
+        }
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        appUserRepository.save(user);
+    }
     public void enableAppUser(String email) {
         appUserRepository.enableAppUser(email);
     }

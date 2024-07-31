@@ -1,20 +1,19 @@
 package com.example.demo.Controller;
 
-import com.example.demo.dto.PasswordResetRequest;
 import com.example.demo.email.EmailSender;
+import com.example.demo.dto.PasswordResetRequest;
 import com.example.demo.service.PasswordResetService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/password-reset")
 public class PasswordResetController {
-
-    @Autowired
     private PasswordResetService passwordResetService;
-
-    @Autowired
     private EmailSender emailService;
 
     @PostMapping("/request")

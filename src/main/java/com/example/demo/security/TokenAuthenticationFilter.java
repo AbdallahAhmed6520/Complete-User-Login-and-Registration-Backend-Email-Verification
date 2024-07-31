@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
     private final ConfirmationTokenService confirmationTokenService;
 
     public TokenAuthenticationFilter(ConfirmationTokenService confirmationTokenService) {
@@ -29,12 +28,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = request.getHeader("Authorization");
 
-        if (token != null && !token.isEmpty()) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Remove "Bearer " prefix
+
             Optional<ConfirmationToken> optionalToken = confirmationTokenService.getToken(token);
             if (optionalToken.isPresent() && !optionalToken.get().isExpired()) {
-                // التحقق من صلاحية الرمز
                 AppUser user = optionalToken.get().getAppUser();
-                // إعداد الجلسة مع معلومات المستخدم
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
