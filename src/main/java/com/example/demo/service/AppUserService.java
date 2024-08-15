@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.UpdateUserRequest;
-import com.example.demo.exception.CustomException;
+import com.example.demo.exception.EmailAlreadyTakenException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.AppUser;
 import com.example.demo.model.ConfirmationToken;
@@ -28,12 +28,9 @@ public class AppUserService implements UserDetailsService {
     private final ConfirmationTokenService confirmationTokenService;
 
     @Override
-    public AppUser loadUserByUsername(String email) throws CustomException {
-        Optional<AppUser> user = appUserRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("User with email " + email + " not found");
-        }
-        return user.get();
+    public AppUser loadUserByUsername(String email) {
+        return appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
     }
 
     public Optional<AppUser> getUserByEmail(String email) {
@@ -41,14 +38,9 @@ public class AppUserService implements UserDetailsService {
     }
 
     public String signUpUser(AppUser appUser) {
-        boolean userExists = appUserRepository
-                .findByEmail(appUser.getEmail())
-                .isPresent();
-
-        if (userExists) {
-            throw new CustomException("Email already taken");
+        if (appUserRepository.findByEmail(appUser.getEmail()).isPresent()) {
+            throw new EmailAlreadyTakenException("Email already taken");
         }
-
         String encodedPassword = passwordEncoder.encode(appUser.getPassword());
         appUser.setPassword(encodedPassword);
         appUserRepository.save(appUser);
@@ -58,33 +50,31 @@ public class AppUserService implements UserDetailsService {
 
     public String generateAndSaveToken(AppUser user) {
         String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1), user);
+        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), user);
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
     }
-
     public String login(String username, String password) {
-        Optional<AppUser> optionalUser = appUserRepository.findByEmail(username);
-        if (optionalUser.isEmpty()) {
-            throw new IllegalStateException("User not found");
-        }
-        AppUser user = optionalUser.get();
+        AppUser user = appUserRepository.findByEmail(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalStateException("Incorrect password");
         }
-
-        // إنشاء وحفظ التوكن
         return generateAndSaveToken(user);
     }
 
     @Transactional
     public void updateUser(Long userId, UpdateUserRequest request, UserDetails userDetails) {
         AppUser user = appUserRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // Verify if the authenticated user is updating their own data
         if (!user.getEmail().equals(userDetails.getUsername())) {
             throw new AccessDeniedException("You can only update your own data");
+        }
+
+        if (appUserRepository.findByEmail(request.getEmail()).isPresent() && !user.getEmail().equals(request.getEmail())) {
+            throw new EmailAlreadyTakenException("Email already taken by another user");
         }
 
         user.setFirstName(request.getFirstName());
@@ -92,10 +82,13 @@ public class AppUserService implements UserDetailsService {
         user.setEmail(request.getEmail());
         appUserRepository.save(user);
     }
-    public void enableAppUser(String email) {
-        appUserRepository.enableAppUser(email);
-    }
 
+    public void enableAppUser(String email) {
+        AppUser user = appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setEnabled(true);
+        appUserRepository.save(user);
+    }
     public void save(AppUser appUser) {
         appUserRepository.save(appUser);
     }

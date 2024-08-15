@@ -29,8 +29,6 @@ public class PasswordResetToken {
     @ManyToOne
     @JoinColumn(name = "app_user_id")
     private AppUser appUser;
-
-    // Add constructor with the required parameters
     public PasswordResetToken(String token, LocalDateTime expiresAt, AppUser appUser) {
         this.token = token;
         this.expiresAt = expiresAt;

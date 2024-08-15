@@ -1,5 +1,6 @@
-package com.example.demo.email;
+package com.example.demo.service;
 
+import com.example.demo.email.EmailSender;
 import com.example.demo.exception.EmailSendingException;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -34,14 +35,15 @@ public class EmailService implements EmailSender {
             helper.setFrom("abdallahahmed6520@gmail.com");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            LOGGER.error("failed to send email", e);
-            throw new EmailSendingException("Failed to send email", e);
+            LOGGER.error("failed to send email");
+            throw new EmailSendingException("Failed to send email");
         }
     }
     public String buildResetPasswordEmail(String email, String link) {
-        return "Hi,\n\n" +
+        return "Hi " + email + ",\n\n" +
                 "To reset your password, please click the following link:\n" +
                 link + "\n\n" +
                 "If you did not request this, please ignore this email.";
     }
+
 }

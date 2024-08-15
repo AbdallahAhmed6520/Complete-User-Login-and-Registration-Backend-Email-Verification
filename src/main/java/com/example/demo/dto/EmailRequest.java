@@ -1,4 +1,4 @@
-package com.example.demo.email;
+package com.example.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,9 +9,6 @@ import lombok.Setter;
 @Getter
 public class EmailRequest {
     private String email;
-
-    public EmailRequest() {
-    }
 
     @JsonCreator
     public EmailRequest(@JsonProperty("email") String email) {

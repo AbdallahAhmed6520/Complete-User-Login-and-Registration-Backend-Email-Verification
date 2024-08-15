@@ -1,8 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.model.AppUser;
-import com.example.demo.service.AppUserService;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.model.AppUser;
 import com.example.demo.model.PasswordResetToken;
 import com.example.demo.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class PasswordResetService {
     private final AppUserService appUserService;
     private final PasswordEncoder passwordEncoder;
 
-    public String generateAndSaveToken(String email) {
+    public String generateAndSaveTokenResetPassword(String email) {
         Optional<AppUser> optionalUser = appUserService.getUserByEmail(email);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");
@@ -38,13 +37,9 @@ public class PasswordResetService {
         if (optionalToken.isEmpty() || optionalToken.get().getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Token is invalid or expired");
         }
-
         PasswordResetToken passwordResetToken = optionalToken.get();
         AppUser user = passwordResetToken.getAppUser();
         user.setPassword(passwordEncoder.encode(newPassword));
         appUserService.save(user);
-
-        // Optionally set the token as confirmed or used
-        passwordResetTokenRepository.delete(passwordResetToken);  // Optionally delete the token after use
     }
 }

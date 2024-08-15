@@ -18,15 +18,4 @@ public class PasswordResetTokenService {
         passwordResetTokenRepository.save(token);
     }
 
-    public Optional<PasswordResetToken> getToken(String token) {
-        return passwordResetTokenRepository.findByToken(token);
-    }
-    public void setConfirmedAt(String token) {
-        passwordResetTokenRepository.findByToken(token)
-                .ifPresent(t -> {
-                    t.setConfirmedAt(LocalDateTime.now());
-                    passwordResetTokenRepository.save(t);
-                });
-    }
-
 }

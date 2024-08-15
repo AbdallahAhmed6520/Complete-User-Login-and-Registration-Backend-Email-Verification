@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.email.EmailRequest;
+import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.RegistrationRequest;
 import com.example.demo.service.RegistrationService;
 import lombok.AllArgsConstructor;
